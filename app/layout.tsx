@@ -1,24 +1,18 @@
-import Link from 'next/link'
-import React from 'react'
+import "./globals.css";
+import { Inter } from "next/font/google";
+import { cn } from "@/lib/utils";
 
-type Props = {
-  children: React.ReactNode
-}
+const inter = Inter({subsets:['latin'],variable:'--font-sans'});
 
-const layout = ({ children }: Props) => {
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="en">
-      <body>
-        <nav>
-            <Link href="/aboutus">aboutus</Link>
-          {/* No prefetching */}
-          <a href="/aboutus/[aboutsus]">[aboutsus]</a>
-        </nav>
-        <main>{children}</main>
-      </body>
+    <html lang="en" className={cn("font-sans", inter.variable)}>
+      <body>{children}</body>
     </html>
-  )
+  );
 }
-
-export default layout
-
