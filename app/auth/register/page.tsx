@@ -1,10 +1,10 @@
+import Register from '@/components/shadcn-space/blocks/register-01/register'
 import React from 'react'
 
 const page = () => {
   return (
     <div>
-      <h1>register</h1>
-      <p>register page</p>
+    <Register />
     </div>
   )
 }
