@@ -6,7 +6,7 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardHeader,
+  CardHeader,  
   CardTitle,
 } from "@/components/ui/card";
 import {
@@ -37,8 +37,10 @@ const RegisterForm = () => {
         body: JSON.stringify({ name, email, password }),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        throw new Error("Failed to register user");
+        throw new Error(data.message || "Failed to register user");
       }
 
       setStatus("Registration successful");
@@ -46,7 +48,7 @@ const RegisterForm = () => {
       setEmail("");
       setPassword("");
     } catch (error) {
-      setStatus("Registration failed. Please try again.");
+      setStatus(error instanceof Error ? error.message : "Registration failed. Please try again.");
     }
   };
 
@@ -185,6 +187,11 @@ const RegisterForm = () => {
                   <Button type="submit" size={"lg"} className="rounded-lg cursor-pointer h-10 hover:bg-primary/80">
                     Sign up
                   </Button>
+                  {status ? (
+                    <p className={`text-sm text-center ${status.includes("successful") ? "text-green-600" : "text-red-600"}`}>
+                      {status}
+                    </p>
+                  ) : null}
                   <FieldDescription className="text-center text-sm font-normal text-muted-foreground">
                     Already have an account?{" "}
                     <a

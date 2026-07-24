@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,16 +10,55 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  try {
+    const body = await req.json();
+    const { name, email, password } = body;
 
-  const { email } = body;
+    if (!name || !email || !password) {
+      return NextResponse.json(
+        { message: "Name, email, and password are required" },
+        { status: 400 }
+      );
+    }
 
-  await db.insert(users).values({
-    name: email.split("@")[0], // temporary name
-    email,
-  });
+    const normalizedEmail = email.trim();
+    const existingUser = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, normalizedEmail))
+      .limit(1);
 
-  return NextResponse.json({
-    message: "User created successfully",
-  });
+    if (existingUser.length > 0) {
+      return NextResponse.json(
+        { message: "Email already registered" },
+        { status: 409 }
+      );
+    }
+
+    await db.insert(users).values({
+      name: name.trim(),
+      email: normalizedEmail,
+      password: password.trim(),
+    });
+
+    return NextResponse.json({
+      message: "User created successfully",
+    });
+  } catch (error) {
+    const pgError = error as { code?: string };
+
+    if (pgError.code === "23505") {
+      return NextResponse.json(
+        { message: "Email already registered" },
+        { status: 409 }
+      );
+    }
+
+    console.error("User registration failed:", error);
+
+    return NextResponse.json(
+      { message: "Failed to create user" },
+      { status: 500 }
+    );
+  }
 }
