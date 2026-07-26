@@ -18,15 +18,19 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
+
 const RegisterForm = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState<string | null>(null);
 
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setStatus(null);
+    
+
 
     try {
       const response = await fetch("/api/users", {

@@ -1,3 +1,4 @@
+import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
@@ -8,6 +9,7 @@ export async function GET() {
 
   return NextResponse.json(data);
 }
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,6 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     const normalizedEmail = email.trim();
+
     const existingUser = await db
       .select({ id: users.id })
       .from(users)
@@ -35,15 +38,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const hashedPassword = await bcrypt.hash(password.trim(), 10);
+
     await db.insert(users).values({
       name: name.trim(),
       email: normalizedEmail,
-      password: password.trim(),
+      password: hashedPassword,
     });
 
-    return NextResponse.json({
-      message: "User created successfully",
-    });
+    return NextResponse.json(
+      { message: "User created successfully" },
+      { status: 201 }
+    );
   } catch (error) {
     const pgError = error as { code?: string };
 
